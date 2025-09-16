@@ -41,4 +41,7 @@ staticfiles/
 *.iml
 
 # ENV / Secrets
-.env
+env
+*.env
+envs
+*.envs
