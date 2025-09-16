@@ -1,12 +1,13 @@
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.permissions import AllowAny
 
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.cache import cache
 
 from demo.models import Product
-from demo.serializers import ProductSerializer
+from demo.serializers.ProductSerializer import ProductSerializer
 
 from demo.helper import generate_cache_key
 import logging
@@ -24,6 +25,7 @@ class ProductListAPIView(ListAPIView):
     search_fields = ['name', 'description']  # search
     ordering_fields = ['price', 'created_at', 'name']  # order by
     ordering = ['-created_at']
+    permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
         user = request.user.id if request.user.is_authenticated else "anonymous"
@@ -56,5 +58,4 @@ class CreateProductAPIView(CreateAPIView):
 
     def perform_create(self, serializer):
         product = serializer.save()
-        cache.delete("products_list")  # clear cache when new product created
         return product
