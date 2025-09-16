@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -70,15 +70,25 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'redis_demo.wsgi.application'
+from dotenv import load_dotenv
+
+# Load .env automatically
+load_dotenv()
+
+# Redis Cache Configuration
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
+REDIS_PREFIX = os.getenv("REDIS_PREFIX")
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",   # Redis host/db (no password here)
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",   # Redis host/db (no password here)
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PASSWORD": "your_password_here",   # Redis password
-            "KEY_PREFIX": "demo",        # cache key prefix
+            "PASSWORD": REDIS_PASSWORD,   # Redis password
+            "KEY_PREFIX": REDIS_PREFIX,        # cache key prefix
             "VERSION": 1,                 # cache version
         }
     }
@@ -86,15 +96,21 @@ CACHES = {
 
 
 # Database
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'your_password_here',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
